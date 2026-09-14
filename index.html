@@ -80,7 +80,6 @@ footer{padding:30px 0;border-top:1px solid #1e1e1e;color:#666;text-align:center;
 <section class="final" id="dang-ky"><div class="wrap"><div class="kicker">SUẤT THAM GIA MIỄN PHÍ</div><h2>3 ngày để bắt đầu xây thương hiệu mà khách hàng <span class="gold">nhớ đến.</span></h2><p>Đừng chờ đến khi salon vắng khách mới bắt đầu làm thương hiệu. Hãy xây tài sản content từ hôm nay.</p>
 <div class="form"><div class="row"><div class="field"><label>HỌ VÀ TÊN</label><input id="name" placeholder="Nguyễn Văn A"></div><div class="field"><label>SỐ ĐIỆN THOẠI</label><input id="phone" placeholder="09xx xxx xxx"></div></div><div class="field"><label>FACEBOOK / ZALO</label><input id="social" placeholder="Tên hoặc đường dẫn tài khoản"></div><button class="btn" onclick="submitForm()">ĐĂNG KÝ THAM GIA MIỄN PHÍ →</button><div style="text-align:center;color:#666;font-size:11px;margin-top:12px">Thông tin chỉ dùng để xác nhận và gửi thông tin chương trình.</div></div></div></section>
 <footer>© 2026 THANH HENRY • CONTENT & ADS • LANDING PAGE DEMO</footer>
-<iframe name="lead-submit-frame" id="lead-submit-frame" style="display:none"></iframe>
 <script>
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMUEq8y_9z9qseuSHOLT_eBxjv6wrxdy7yT2hP53pGKP2TdqpJYQdkzMfW_4iHiC7piw/exec';
 
@@ -94,14 +93,10 @@ function submitForm(){
   const social=document.getElementById('social').value.trim();
   if(!n||!p){alert('Vui lòng nhập họ tên và số điện thoại.');return}
 
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action=GOOGLE_SCRIPT_URL;
-  form.target='lead-submit-frame';
-  form.style.display='none';
-
-  const data={
-    name:n, phone:p, social:social,
+  const params = new URLSearchParams({
+    name:n,
+    phone:p,
+    social:social,
     source:document.referrer || window.location.hostname,
     campaign:getParam('utm_campaign'),
     adset:getParam('utm_adset'),
@@ -110,14 +105,11 @@ function submitForm(){
     utm_medium:getParam('utm_medium'),
     utm_campaign:getParam('utm_campaign'),
     utm_content:getParam('utm_content')
-  };
-
-  Object.entries(data).forEach(([key,value])=>{
-    const input=document.createElement('input');
-    input.type='hidden'; input.name=key; input.value=value; form.appendChild(input);
   });
-  document.body.appendChild(form);
-  form.submit();
+
+  // Gửi bằng GET tới Google Apps Script: không phụ thuộc iframe/CORS.
+  const img = new Image();
+  img.src = GOOGLE_SCRIPT_URL + '?' + params.toString();
 
   alert('Đăng ký thành công! Anh/chị đã được ghi nhận.');
   document.getElementById('name').value='';
